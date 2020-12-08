@@ -46,10 +46,7 @@ impl Tile {
 
     pub fn is_valid(&self) -> bool {
         fn valid_number(number: &u8) -> bool {
-            match number {
-                1..=9 => true,
-                _ => false,
-            }
+            matches!(number, 1..=9)
         };
 
         match self {
@@ -73,7 +70,7 @@ mod tile_tests {
     }
 }
 
-impl std::fmt::Display for Tile {
+impl Display for Tile {
     fn fmt(&self, f: &mut Formatter<'_>) -> FormatResult {
         match self {
             Tile::Character {
@@ -108,7 +105,7 @@ pub enum WindDirection {
     North,
 }
 
-impl std::fmt::Display for WindDirection {
+impl Display for WindDirection {
     fn fmt(&self, f: &mut Formatter<'_>) -> FormatResult {
         match self {
             WindDirection::East => write!(f, "Ton"),
@@ -126,7 +123,7 @@ pub enum DragonColor {
     Red,
 }
 
-impl std::fmt::Display for DragonColor {
+impl Display for DragonColor {
     fn fmt(&self, f: &mut Formatter<'_>) -> FormatResult {
         match self {
             DragonColor::White => write!(f, "Haku"),
