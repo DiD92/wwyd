@@ -1,0 +1,10 @@
+[package]
+name = "wwyd"
+version = "0.1.0"
+authors = ["Dídac Sementé Fernández <didac.semente@gmail.com>"]
+edition = "2018"
+description = "What would you discard?"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
