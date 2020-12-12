@@ -1,16 +1,21 @@
+use serde::Deserialize;
 use std::fmt::{Display, Formatter, Result as FormatResult};
+use strum_macros::{Display as EnumDisplay, EnumString};
 
 pub type Hand = [Tile; 13];
 
-#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Deserialize, EnumString, EnumDisplay)]
 pub enum NumberedSuit {
+    #[strum(serialize = "man", serialize = "M", to_string = "Manzu")]
     Characters,
+    #[strum(serialize = "pin", serialize = "P", to_string = "Pinzu")]
     Circles,
+    #[strum(serialize = "sou", serialize = "S", to_string = "Souzu")]
     Bamboos,
 }
 
-#[derive(Copy, Clone, Debug, Eq, PartialEq)]
-pub enum HonorSUit {
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Deserialize)]
+pub enum HonorSuit {
     Winds,
     Dragons,
 }
@@ -91,44 +96,30 @@ impl Display for Tile {
             } => {
                 write!(f, "Sou{}{}", number, if *red { "r" } else { "" })
             }
-            Tile::Wind(direction) => write!(f, "{}", direction),
-            Tile::Dragon(color) => write!(f, "{}", color),
+            Tile::Wind(direction) => write!(f, "{}", direction.to_string()),
+            Tile::Dragon(color) => write!(f, "{}", color.to_string()),
         }
     }
 }
 
-#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Deserialize, EnumString, EnumDisplay)]
 pub enum WindDirection {
+    #[strum(serialize = "ton", serialize = "E", to_string = "Ton")]
     East,
+    #[strum(serialize = "nan", serialize = "S", to_string = "Nan")]
     South,
+    #[strum(serialize = "shaa", serialize = "W", to_string = "Shaa")]
     West,
+    #[strum(serialize = "pei", serialize = "N", to_string = "Pei")]
     North,
 }
 
-impl Display for WindDirection {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FormatResult {
-        match self {
-            WindDirection::East => write!(f, "Ton"),
-            WindDirection::South => write!(f, "Nan"),
-            WindDirection::West => write!(f, "Shaa"),
-            WindDirection::North => write!(f, "Pei"),
-        }
-    }
-}
-
-#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Deserialize, EnumString, EnumDisplay)]
 pub enum DragonColor {
+    #[strum(serialize = "haku", serialize = "W", to_string = "Haku")]
     White,
+    #[strum(serialize = "hatsu", serialize = "G", to_string = "Hatsu")]
     Green,
+    #[strum(serialize = "chun", serialize = "R", to_string = "Chun")]
     Red,
-}
-
-impl Display for DragonColor {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FormatResult {
-        match self {
-            DragonColor::White => write!(f, "Haku"),
-            DragonColor::Green => write!(f, "Hatsu"),
-            DragonColor::Red => write!(f, "Chun"),
-        }
-    }
 }

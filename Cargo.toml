@@ -8,3 +8,8 @@ description = "What would you discard?"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+toml = "0.5"
+serde = { version = "1.0", features = ["derive"] }
+anyhow = "1.0"
+strum = "0.20"
+strum_macros = "0.20"

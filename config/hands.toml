@@ -1,0 +1,31 @@
+[[hand]]
+name = "Honiisou"
+kanji = "混一色"
+description = "Honor tiles with one suit"
+[hand.restrictions]
+honor_tiles = "required"
+honor_variants = 4
+honor_wind_directions_allowed = ["*"]
+honor_dragon_colors_allowed = ["*"]
+suit_tiles = "required"
+suit_variants = 1
+suit_variants_allowed = ["*"]
+suit_numbers_allowed = []
+shapes_allowed = ["*"]
+hand_shape = "regular"
+
+[[hand]]
+name = "Honroutou"
+kanji = "混老頭"
+description = "Honor tiles with terminals"
+[hand.restrictions]
+honor_tiles = "required"
+honor_variants = 7
+honor_wind_directions_allowed = ["*"]
+honor_dragon_colors_allowed = ["*"]
+suit_tiles = "required"
+suit_variants = 3
+suit_variants_allowed = ["*"]
+suit_numbers_allowed = [1, 9]
+shapes_allowed = ["koutsu", "kantsu", "jantou"]
+hand_shape = "both"
