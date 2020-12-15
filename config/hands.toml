@@ -29,3 +29,4 @@ suit_variants_allowed = ["*"]
 suit_numbers_allowed = [1, 9]
 shapes_allowed = ["koutsu", "kantsu", "jantou"]
 hand_shape = "both"
+irregular_shape = [{"group_type" = "jantou", "group_count" = 7}]

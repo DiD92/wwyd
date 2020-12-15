@@ -36,6 +36,82 @@ pub struct HandRestrictions {
     #[serde(deserialize_with = "crate::serialization::deserialize_tile_group")]
     shapes_allowed: Option<Vec<TileGroup>>,
     hand_shape: HandShape,
+    irregular_shape: Option<Vec<ShapeGroup>>,
+}
+
+impl HandRestrictions {
+    #[inline]
+    pub fn can_contain_honors(&self) -> bool {
+        !matches!(self.honor_tiles, Some(TileRequirement::Forbidden))
+    }
+
+    pub fn usable_honor_variants_count(&self) -> Option<u8> {
+        if self.can_contain_honors() {
+            self.honor_variants.or(Some(7))
+        } else {
+            None
+        }
+    }
+
+    pub fn wind_directions_allowed(&self) -> Option<&Vec<WindDirection>> {
+        if self.can_contain_honors() {
+            self.honor_wind_directions_allowed.as_ref()
+        } else {
+            None
+        }
+    }
+
+    pub fn dragon_colors_allowed(&self) -> Option<&Vec<DragonColor>> {
+        if self.can_contain_honors() {
+            self.honor_dragon_colors_allowed.as_ref()
+        } else {
+            None
+        }
+    }
+
+    #[inline]
+    pub fn can_contain_suits(&self) -> bool {
+        !matches!(self.suit_tiles, Some(TileRequirement::Forbidden))
+    }
+
+    pub fn usable_suit_variants_count(&self) -> Option<u8> {
+        if self.can_contain_suits() {
+            self.honor_variants.or(Some(3))
+        } else {
+            None
+        }
+    }
+
+    pub fn suit_variants_allowed(&self) -> Option<&Vec<NumberedSuit>> {
+        if self.can_contain_suits() {
+            self.suit_variants_allowed.as_ref()
+        } else {
+            None
+        }
+    }
+
+    pub fn suit_numbers_allowed(&self) -> Option<&Vec<u8>> {
+        if self.can_contain_suits() {
+            self.suit_numbers_allowed.as_ref()
+        } else {
+            None
+        }
+    }
+
+    pub fn shapes_allowed(&self) -> Option<&Vec<TileGroup>> {
+        self.shapes_allowed.as_ref()
+    }
+
+    pub fn hand_shape(&self) -> HandShape {
+        self.hand_shape
+    }
+
+    pub fn irregular_shape_set(&self) -> Option<&Vec<ShapeGroup>> {
+        match self.hand_shape {
+            HandShape::Regular => None,
+            _ => self.irregular_shape.as_ref(),
+        }
+    }
 }
 
 #[derive(Deserialize, Debug)]
@@ -46,7 +122,7 @@ pub enum TileRequirement {
     Forbidden,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Copy, Clone)]
 #[serde(rename_all = "lowercase")]
 pub enum HandShape {
     Regular,
@@ -54,7 +130,7 @@ pub enum HandShape {
     Both,
 }
 
-#[derive(Deserialize, Debug, EnumString, EnumDisplay)]
+#[derive(Deserialize, Debug, Copy, Clone, EnumString, EnumDisplay)]
 #[serde(rename_all = "lowercase")]
 pub enum TileGroup {
     #[strum(serialize = "shuntsu", serialize = "123", to_string = "Shuntsu")]
@@ -65,4 +141,12 @@ pub enum TileGroup {
     Kantsu,
     #[strum(serialize = "jantou", serialize = "11", to_string = "Jantou")]
     Jantou,
+    #[strum(serialize = "shinguru", serialize = "1", to_string = "Shinguru")]
+    Shinguru,
+}
+
+#[derive(Deserialize, Debug, Copy, Clone)]
+pub struct ShapeGroup {
+    group_type: TileGroup,
+    group_count: u8,
 }

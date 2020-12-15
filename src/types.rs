@@ -4,6 +4,11 @@ use strum_macros::{Display as EnumDisplay, EnumString};
 
 pub type Hand = [Tile; 13];
 
+pub struct WWYD {
+    pub current_hand: Hand,
+    pub robbed_tile: Tile,
+}
+
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Deserialize, EnumString, EnumDisplay)]
 pub enum NumberedSuit {
     #[strum(serialize = "man", serialize = "M", to_string = "Manzu")]

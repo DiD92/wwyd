@@ -2,6 +2,7 @@ use crate::hand::HandList;
 use anyhow::Result;
 use std::fs::read_to_string;
 
+mod generator;
 mod hand;
 mod serialization;
 mod types;
