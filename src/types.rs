@@ -9,7 +9,7 @@ pub struct WWYD {
     pub robbed_tile: Tile,
 }
 
-#[derive(Copy, Clone, Debug, Eq, PartialEq, Deserialize, EnumString, EnumDisplay)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Deserialize, Hash, EnumString, EnumDisplay)]
 pub enum NumberedSuit {
     #[strum(serialize = "man", serialize = "M", to_string = "Manzu")]
     Characters,
@@ -25,7 +25,7 @@ pub enum HonorSuit {
     Dragons,
 }
 
-#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Hash)]
 pub enum Tile {
     Character { number: u8, is_red: bool },
     Circle { number: u8, is_red: bool },
@@ -107,7 +107,7 @@ impl Display for Tile {
     }
 }
 
-#[derive(Copy, Clone, Debug, Eq, PartialEq, Deserialize, EnumString, EnumDisplay)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Deserialize, Hash, EnumString, EnumDisplay)]
 pub enum WindDirection {
     #[strum(serialize = "ton", serialize = "E", to_string = "Ton")]
     East,
@@ -119,7 +119,7 @@ pub enum WindDirection {
     North,
 }
 
-#[derive(Copy, Clone, Debug, Eq, PartialEq, Deserialize, EnumString, EnumDisplay)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Deserialize, Hash, EnumString, EnumDisplay)]
 pub enum DragonColor {
     #[strum(serialize = "haku", serialize = "W", to_string = "Haku")]
     White,

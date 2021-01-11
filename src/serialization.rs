@@ -2,17 +2,30 @@ use crate::hand::TileGroup;
 use crate::types::{DragonColor, NumberedSuit, WindDirection};
 use serde::de::{SeqAccess, Visitor};
 use serde::Deserializer;
+use std::collections::HashSet;
 use std::fmt::{Formatter, Result as FormatResult};
 use std::marker::PhantomData;
 use std::str::FromStr;
 
-trait EnumExpander {
+macro_rules! set {
+    ( $( $x:expr ),* ) => {
+        {
+            let mut temp_set = HashSet::new();
+            $(
+                temp_set.insert($x);
+            )*
+            temp_set
+        }
+    };
+}
+
+pub trait EnumExpander {
     fn get_message() -> String;
     fn parse_single(item: &str) -> Self
     where
         Self: Sized;
 
-    fn get_all_variants() -> Vec<Self>
+    fn get_all_variants() -> HashSet<Self>
     where
         Self: Sized;
 }
@@ -26,12 +39,12 @@ impl EnumExpander for WindDirection {
         WindDirection::from_str(item).unwrap()
     }
 
-    fn get_all_variants() -> Vec<WindDirection> {
-        vec![
+    fn get_all_variants() -> HashSet<WindDirection> {
+        set![
             WindDirection::East,
             WindDirection::South,
             WindDirection::West,
-            WindDirection::North,
+            WindDirection::North
         ]
     }
 }
@@ -45,8 +58,8 @@ impl EnumExpander for DragonColor {
         DragonColor::from_str(item).unwrap()
     }
 
-    fn get_all_variants() -> Vec<DragonColor> {
-        vec![DragonColor::White, DragonColor::Green, DragonColor::Red]
+    fn get_all_variants() -> HashSet<DragonColor> {
+        set![DragonColor::White, DragonColor::Green, DragonColor::Red]
     }
 }
 
@@ -59,11 +72,11 @@ impl EnumExpander for NumberedSuit {
         NumberedSuit::from_str(item).unwrap()
     }
 
-    fn get_all_variants() -> Vec<NumberedSuit> {
-        vec![
+    fn get_all_variants() -> HashSet<NumberedSuit> {
+        set![
             NumberedSuit::Characters,
             NumberedSuit::Circles,
-            NumberedSuit::Bamboos,
+            NumberedSuit::Bamboos
         ]
     }
 }
@@ -77,12 +90,12 @@ impl EnumExpander for TileGroup {
         TileGroup::from_str(item).unwrap()
     }
 
-    fn get_all_variants() -> Vec<TileGroup> {
-        vec![
+    fn get_all_variants() -> HashSet<TileGroup> {
+        set![
             TileGroup::Jantou,
             TileGroup::Shuntsu,
             TileGroup::Koutsu,
-            TileGroup::Kantsu,
+            TileGroup::Kantsu
         ]
     }
 }
@@ -107,9 +120,9 @@ where
 
 impl<'de, T> Visitor<'de> for TileParser<T>
 where
-    T: EnumExpander,
+    T: EnumExpander + Eq + std::hash::Hash,
 {
-    type Value = Option<Vec<T>>;
+    type Value = Option<HashSet<T>>;
 
     fn expecting(&self, formatter: &mut Formatter<'_>) -> FormatResult {
         write!(formatter, "{}", T::get_message())
@@ -122,9 +135,9 @@ where
         let size_hint = seq.size_hint().unwrap();
 
         if size_hint == 0 {
-            Ok(Some(Vec::new()))
+            Ok(Some(HashSet::new()))
         } else {
-            let mut vec: Vec<T> = Vec::with_capacity(size_hint);
+            let mut item_set: HashSet<T> = HashSet::with_capacity(size_hint);
 
             loop {
                 let tmp = seq.next_element::<String>()?;
@@ -134,9 +147,9 @@ where
                         return Ok(Some(T::get_all_variants()));
                     }
 
-                    vec.push(T::parse_single(&value));
+                    item_set.insert(T::parse_single(&value));
                 } else {
-                    return Ok(Some(vec));
+                    return Ok(Some(item_set));
                 }
             }
         }
@@ -145,7 +158,7 @@ where
 
 pub fn deserialize_wind_direction<'de, D>(
     deserializer: D,
-) -> Result<Option<Vec<WindDirection>>, D::Error>
+) -> Result<Option<HashSet<WindDirection>>, D::Error>
 where
     D: Deserializer<'de>,
 {
@@ -155,7 +168,7 @@ where
 
 pub fn deserialize_dragon_color<'de, D>(
     deserializer: D,
-) -> Result<Option<Vec<DragonColor>>, D::Error>
+) -> Result<Option<HashSet<DragonColor>>, D::Error>
 where
     D: Deserializer<'de>,
 {
@@ -165,7 +178,7 @@ where
 
 pub fn deserialize_suit_variant<'de, D>(
     deserializer: D,
-) -> Result<Option<Vec<NumberedSuit>>, D::Error>
+) -> Result<Option<HashSet<NumberedSuit>>, D::Error>
 where
     D: Deserializer<'de>,
 {
@@ -173,7 +186,9 @@ where
     deserializer.deserialize_seq(parser)
 }
 
-pub fn deserialize_tile_group<'de, D>(deserializer: D) -> Result<Option<Vec<TileGroup>>, D::Error>
+pub fn deserialize_tile_group<'de, D>(
+    deserializer: D,
+) -> Result<Option<HashSet<TileGroup>>, D::Error>
 where
     D: Deserializer<'de>,
 {

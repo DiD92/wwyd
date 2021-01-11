@@ -1,7 +1,6 @@
-use crate::hand::{HandRestrictions, TileRequirement};
-use crate::types::{Tile, WWYD};
-use std::collections::HashMap;
-use std::panic::resume_unwind;
+use crate::hand::HandRestrictions;
+use crate::types::{DragonColor, NumberedSuit, Tile, WindDirection, WWYD};
+use std::collections::{HashMap, HashSet};
 
 pub struct HandGenerator {
     restrictions: HandRestrictions,
@@ -40,25 +39,59 @@ struct TilePool {
 
 impl TilePool {
     pub fn new(restrictions: &HandRestrictions) -> Self {
-        let expected_capacity = compute_total_tiles_available_with(restrictions);
-        let mut tile_pool: HashMap<Tile, u8> = HashMap::with_capacity(expected_capacity);
+        let expected_capacity = TilePool::compute_total_tiles_available_with(restrictions);
+        let mut tile_pool: HashMap<Tile, u8> = HashMap::with_capacity(expected_capacity as usize);
+
+        Self::fill_pool_with_suit_tiles(
+            &mut tile_pool,
+            &restrictions.suit_variants_allowed(),
+            &restrictions.suit_numbers_allowed(),
+        );
+
+        Self::fill_pool_with_honor_tiles(
+            &mut tile_pool,
+            &restrictions.wind_directions_allowed(),
+            &restrictions.dragon_colors_allowed(),
+        );
 
         TilePool { pool: tile_pool }
     }
 
     fn compute_total_tiles_available_with(restrictions: &HandRestrictions) -> u8 {
-        let honor_tiles_available_count = restrictions
-            .usable_honor_variants_count()
-            .unwrap_or_default()
-            * 4;
-        let suit_tiles_available_count = restrictions.usable_suit_variants_count()
-            * restrictions
-                .suit_numbers_allowed()
-                .unwrap_or(&vec![])
-                .iter()
-                .sum()
+        let honor_tiles_available_count: u8 = restrictions.usable_honor_variants_count() * 4;
+        let suit_tiles_available_count: u8 = restrictions.usable_suit_variants_count()
+            * restrictions.suit_numbers_allowed().len() as u8
             * 4;
 
         honor_tiles_available_count + suit_tiles_available_count
+    }
+
+    fn fill_pool_with_suit_tiles(
+        pool: &mut HashMap<Tile, u8>,
+        suits_allowed: &HashSet<NumberedSuit>,
+        numbers_allowed: &HashSet<u8>,
+    ) {
+        for suit in suits_allowed {
+            for number in numbers_allowed {
+                let tile = Tile::new_numbered(*suit, *number, false);
+                pool.entry(tile).or_insert(4);
+            }
+        }
+    }
+
+    fn fill_pool_with_honor_tiles(
+        pool: &mut HashMap<Tile, u8>,
+        wind_directions_allowed: &HashSet<WindDirection>,
+        dragon_colors_allowed: &HashSet<DragonColor>,
+    ) {
+        for direction in wind_directions_allowed {
+            let tile = Tile::new_wind(*direction);
+            pool.entry(tile).or_insert(4);
+        }
+
+        for color in dragon_colors_allowed {
+            let tile = Tile::new_dragon(*color);
+            pool.entry(tile).or_insert(4);
+        }
     }
 }

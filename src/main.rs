@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use crate::hand::HandList;
 use anyhow::Result;
 use std::fs::read_to_string;
